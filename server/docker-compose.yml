@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      ANIGIT_ALLOW_REGISTRATION: ${ANIGIT_ALLOW_REGISTRATION:-false}
+      ANIGIT_MAX_OBJECT_MB: ${ANIGIT_MAX_OBJECT_MB:-512}
+      ANIGIT_PROJECT_QUOTA_GB: ${ANIGIT_PROJECT_QUOTA_GB:-50}
+    volumes:
+      - anigit_data:/data
+    expose:
+      - "8000"
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - app
+volumes:
+  anigit_data:
+  caddy_data:
